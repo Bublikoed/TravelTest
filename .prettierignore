@@ -6,4 +6,5 @@ coverage
 *.min.css
 package-lock.json
 yarn.lock
+src/api/api.ts
 

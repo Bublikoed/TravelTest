@@ -1,0 +1,15 @@
+/* Список турів */
+.tours-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+    margin-top: 20px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .tours-list {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+}
