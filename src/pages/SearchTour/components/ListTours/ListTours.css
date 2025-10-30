@@ -1,0 +1,42 @@
+.tours-list-container {
+    width: 100%;
+    max-width: 700px;
+    padding: 25px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(250px, 1fr));
+    gap: 16px;
+    align-content: start;
+    min-height: calc(100vh - 300px);
+}
+
+.tours-list-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.tours-list-price-link {
+    align-self: flex-start;
+    color: #0d6efd;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.tours-list-price-link:hover {
+    text-decoration: underline;
+}
+
+/* Center a single message like "турів не знайдено" vertically and horizontally */
+.tours-list-container > div:only-child {
+    margin: auto;
+    text-align: center;
+}
+
+/* If the available width is too small to keep two 250px columns (plus gap),
+   switch to a single column. 2*250 + 16 gap + 50 padding ≈ 566px viewport */
+@media (max-width: 566px) {
+    .tours-list-container {
+        grid-template-columns: 1fr;
+    }
+}

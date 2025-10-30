@@ -1,30 +1,35 @@
 import React from 'react';
+import { Loader } from '../../ui/Loader';
 import './ContentStateBox.css';
 
-const statusTextMap = {
+const statusTextMap: Record<number, { header: string; text: string }> = {
+    400: {
+        header: '400 Некоректний запит',
+        text: 'Перевірте обовʼязкові параметри та спробуйте ще раз.',
+    },
     402: {
-        header: 'alert.payment_required.title',
-        text: 'alert.payment_required.description',
+        header: '402 Payment Required',
+        text: 'The request requires payment.',
     },
     403: {
-        header: 'alert.access_denied.title',
-        text: 'alert.access_denied.description',
+        header: '403 Заборонено',
+        text: 'У вас немає дозволу для виконання цього запиту.',
     },
     404: {
-        header: 'alert.page_not_found.title',
-        text: 'alert.page_not_found.description',
+        header: '404 Не знайдено',
+        text: 'Ресурс з таким ідентифікатором не знайдено.',
+    },
+    425: {
+        header: '425 Занадто рано',
+        text: 'Результати ще не готові. Будь ласка, зачекайте.',
     },
     500: {
-        header: 'alert.internal_server_error.title',
-        text: 'alert.internal_server_error.description',
+        header: '500 Внутрішня помилка сервера',
+        text: 'Сталася неочікувана помилка. Спробуйте пізніше.',
     },
     502: {
-        header: 'alert.bad_gateway.title',
-        text: 'alert.bad_gateway.description',
-    },
-    503: {
-        header: 'alert.service_temporarily_unavailable.title',
-        text: 'alert.service_temporarily_unavailable.description',
+        header: '502 Помилкова шлюзова відповідь',
+        text: 'Отримано некоректну відповідь від проміжного сервера.',
     },
 };
 
@@ -32,24 +37,42 @@ type ContentStateBoxProps = {
     isLoading?: boolean;
     isError?: boolean;
     statusCode?: number | null | undefined;
+    message?: string | null;
     children?: React.ReactNode | React.ReactNode[] | null;
 };
+
 function ContentStateBox({
     isLoading = false,
     isError = false,
     statusCode = null,
+    message = null,
     children = null,
 }: ContentStateBoxProps): React.ReactElement | null {
-    // const currentStatusText = statusTextMap[statusCode] || {};
+    if (isLoading) {
+        return (
+            <div className="content-state-box">
+                <Loader />
+            </div>
+        );
+    }
 
-    // if (isLoading) {
-    //     return <Loader />;
-    // }
-    // if (isError) {
+    if (isError) {
+        const current = statusTextMap[statusCode ?? 500] || {
+            header: 'Невідома помилка',
+            text: 'Сталася непередбачувана помилка.',
+        };
 
-    // }
+        return (
+            <div className="content-state-box">
+                <div className="error-box">
+                    <h2>{current.header}</h2>
+                    <p>{message ?? current.text}</p>
+                </div>
+            </div>
+        );
+    }
 
-    return <div>{children}</div>;
+    return <div className="content-state-box">{children}</div>;
 }
 
 export default ContentStateBox;

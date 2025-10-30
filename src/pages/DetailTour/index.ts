@@ -1,3 +1,3 @@
-import DetailTour from './DetailTour';
+import DetailTourPage from './DetailTourPage';
 
-export default DetailTour;
+export default DetailTourPage;

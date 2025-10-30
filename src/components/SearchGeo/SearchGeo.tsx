@@ -1,10 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
-import { useVirtualizer } from '@tanstack/react-virtual';
 import { useEffect, useRef, useState } from 'react';
-// eslint-disable-next-line import/no-unresolved
-import { v4 as uuidv4 } from 'uuid';
-import { searchGeo } from '../../api/api';
+import { getCountries, searchGeo } from '../../api/api';
 import { Button, Input } from '../../ui';
+import GeoDropdown from '../GeoDropdown';
 import './SearchGeo.css';
 
 type GeoItem = {
@@ -12,6 +10,13 @@ type GeoItem = {
     name: string;
     type: 'country' | 'city' | 'hotel';
     countryId?: string;
+    flag?: string;
+};
+
+type CountryItem = {
+    id: string | number;
+    name: string;
+    type: 'country';
     flag?: string;
 };
 
@@ -23,6 +28,7 @@ function SerchGeo({
     defaultValue?: GeoItem | null;
 }) {
     const [inputValue, setInputValue] = useState(defaultValue?.name || '');
+    const [countriesData, setCountriesData] = useState<GeoItem[]>([]);
     const [selectedItem, setSelectedItem] = useState<GeoItem | null>(
         defaultValue || null,
     );
@@ -31,7 +37,6 @@ function SerchGeo({
         'all' | 'country' | 'city' | 'hotel'
     >('all');
     const dropdownRef = useRef<HTMLDivElement>(null);
-    const parentRef = useRef<HTMLDivElement>(null);
 
     const {
         data: geoData,
@@ -64,13 +69,7 @@ function SerchGeo({
             (inputValue.length >= 1 || inputValue.length === 0),
     });
 
-    // Віртуалізатор для дропдауну
-    const virtualizer = useVirtualizer({
-        count: geoData?.length || 0,
-        getScrollElement: () => parentRef.current,
-        estimateSize: () => 50, // Приблизна висота елемента
-        overscan: 5, // Кількість елементів для рендерингу поза видимою областю
-    });
+    const listToShow = countriesData.length > 0 ? countriesData : geoData || [];
 
     // Синхронізуємо з defaultValue при зміні
     useEffect(() => {
@@ -109,42 +108,38 @@ function SerchGeo({
         setFilterType('all');
         setIsDropdownOpen(true);
     };
-
     const handleItemSelect = (item: GeoItem) => {
         setSelectedItem(item);
         setInputValue(item.name);
         setFilterType(item.type);
         setIsDropdownOpen(false);
     };
+    const handleInputFocus = async () => {
+        if (selectedItem?.type === 'country') {
+            try {
+                const res = await getCountries();
+                const json = await res.json();
+                const list = Object.values(json).map((item) => ({
+                    ...(item as CountryItem),
+                    type: 'country',
+                })) as GeoItem[];
 
-    const handleInputFocus = () => {
-        if (selectedItem) {
-            setFilterType(selectedItem.type);
-        } else {
-            setFilterType('all');
+                setCountriesData(list);
+                setFilterType('country');
+            } catch (err) {
+                console.error('Не вдалося завантажити країни', err);
+                setCountriesData([]);
+            }
         }
+
         setIsDropdownOpen(true);
     };
-
     const handleClear = () => {
         setInputValue('');
         setSelectedItem(null);
         setFilterType('all');
         setIsDropdownOpen(false);
-        onChange(null);
-    };
-
-    const getItemIcon = (type: string) => {
-        switch (type) {
-            case 'country':
-                return '🌍';
-            case 'city':
-                return '🏙️';
-            case 'hotel':
-                return '🏨';
-            default:
-                return '📍';
-        }
+        setCountriesData([]);
     };
 
     return (
@@ -171,126 +166,19 @@ function SerchGeo({
                             </button>
                         )}
                     </div>
-                    {isDropdownOpen && (
-                        <div className="dropdown">
-                            {isLoading && (
-                                <div className="dropdown-item dropdown-loading">
-                                    Завантаження...
-                                </div>
-                            )}
-                            {error && (
-                                <div className="dropdown-item dropdown-error">
-                                    Помилка завантаження
-                                </div>
-                            )}
-                            {geoData && geoData.length > 0 && (
-                                <div
-                                    ref={parentRef}
-                                    className="dropdown-virtual-container"
-                                    style={{
-                                        height: '200px', // Фіксована висота для скролу
-                                        overflow: 'auto',
-                                    }}
-                                >
-                                    <div
-                                        style={{
-                                            height: `${virtualizer.getTotalSize()}px`,
-                                            width: '100%',
-                                            position: 'relative',
-                                        }}
-                                    >
-                                        {virtualizer
-                                            .getVirtualItems()
-                                            .map((virtualItem) => {
-                                                const item =
-                                                    geoData[virtualItem.index];
-                                                const itemId =
-                                                    item.id || uuidv4();
-
-                                                return (
-                                                    <div
-                                                        key={itemId}
-                                                        className="dropdown-item"
-                                                        role="button"
-                                                        tabIndex={0}
-                                                        onClick={() =>
-                                                            handleItemSelect(
-                                                                item,
-                                                            )
-                                                        }
-                                                        onKeyDown={() => {}}
-                                                        style={{
-                                                            position:
-                                                                'absolute',
-                                                            top: 0,
-                                                            left: 0,
-                                                            width: '100%',
-                                                            height: `${virtualItem.size}px`,
-                                                            transform: `translateY(${virtualItem.start}px)`,
-                                                        }}
-                                                    >
-                                                        <div className="item-content">
-                                                            <span className="item-icon">
-                                                                {item.type ===
-                                                                    'country' &&
-                                                                item?.flag &&
-                                                                item?.flag
-                                                                    .length >
-                                                                    0 ? (
-                                                                    <img
-                                                                        src={
-                                                                            item.flag
-                                                                        }
-                                                                        alt={
-                                                                            item.name
-                                                                        }
-                                                                        width={
-                                                                            20
-                                                                        }
-                                                                        height={
-                                                                            20
-                                                                        }
-                                                                    />
-                                                                ) : (
-                                                                    getItemIcon(
-                                                                        item.type,
-                                                                    )
-                                                                )}
-                                                            </span>
-                                                            <span className="item-name">
-                                                                {item.name}
-                                                            </span>
-                                                        </div>
-                                                        <span className="item-type">
-                                                            {(() => {
-                                                                switch (
-                                                                    item.type
-                                                                ) {
-                                                                    case 'country':
-                                                                        return 'Країна';
-                                                                    case 'city':
-                                                                        return 'Місто';
-                                                                    default:
-                                                                        return 'Готель';
-                                                                }
-                                                            })()}
-                                                        </span>
-                                                    </div>
-                                                );
-                                            })}
-                                    </div>
-                                </div>
-                            )}
-                            {geoData &&
+                    <GeoDropdown
+                        isOpen={isDropdownOpen}
+                        isLoading={!!isLoading}
+                        error={error}
+                        items={listToShow}
+                        showEmpty={Boolean(
+                            geoData &&
                                 geoData.length === 0 &&
                                 inputValue.length >= 1 &&
-                                !isLoading && (
-                                    <div className="dropdown-item dropdown-empty">
-                                        Нічого не знайдено
-                                    </div>
-                                )}
-                        </div>
-                    )}
+                                !isLoading,
+                        )}
+                        onSelect={handleItemSelect}
+                    />
                 </div>
             </div>
             <Button

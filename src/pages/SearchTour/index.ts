@@ -1,3 +1,3 @@
-import SearchTourPage from './SearchTour';
+import SearchTourPage from './SearchTourPage';
 
 export default SearchTourPage;

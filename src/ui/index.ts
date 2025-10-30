@@ -9,3 +9,7 @@ export type { HotelCardProps } from './HotelCard';
 // Button component
 export { Button } from './Button';
 export type { ButtonProps } from './Button';
+
+// Loader component
+export { Loader } from './Loader';
+export type { LoaderProps } from './Loader';

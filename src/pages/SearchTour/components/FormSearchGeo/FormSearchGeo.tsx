@@ -1,4 +1,4 @@
-import SearchGeo from '../../../components/SearchGeo';
+import SearchGeo from '../../../../components/SearchGeo';
 import './FormSearchGeo.css';
 
 type GeoItem = {

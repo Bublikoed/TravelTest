@@ -1,16 +1,13 @@
-import { ComponentType, useEffect, useState } from 'react';
+import { ComponentType, useMemo } from 'react';
+import {
+    setFilters as setFiltersAction,
+    updateFilter as updateFilterAction,
+    type FiltersState as Filters,
+    type GeoItem,
+} from '../store/filtersSlice';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
 
-type GeoItem = {
-    id: string | number;
-    name: string;
-    type: 'country' | 'city' | 'hotel';
-    countryId?: string;
-    flag?: string;
-};
-
-type Filters = {
-    selectedGeo: GeoItem | null;
-};
+// Types re-exported from Redux slice
 
 interface WithFiltersProps {
     filters: Filters;
@@ -18,72 +15,31 @@ interface WithFiltersProps {
     updateFilter: (key: keyof Filters, value: any) => void;
 }
 
-const FILTERS_STORAGE_KEY = 'travel_filters';
-
 function withFilters<P extends object>(
     WrappedComponent: ComponentType<P & WithFiltersProps>,
 ): ComponentType<P> {
     function WithFiltersComponent(props: P) {
-        const [filters, setFiltersState] = useState<Filters>(() => {
-            try {
-                const savedFilters = localStorage.getItem(FILTERS_STORAGE_KEY);
+        const dispatch = useAppDispatch();
+        const filters = useAppSelector((state) => state.filters);
 
-                if (savedFilters) {
-                    return JSON.parse(savedFilters);
-                }
-            } catch (error) {
-                console.warn(
-                    'Failed to parse filters from localStorage:',
-                    error,
+        const setFilters = useMemo(
+            () => (newFilters: Filters) => {
+                dispatch(setFiltersAction(newFilters));
+            },
+            [dispatch],
+        );
+
+        const updateFilter = useMemo(
+            () => (key: keyof Filters, value: any) => {
+                dispatch(
+                    updateFilterAction({
+                        key: key as keyof Filters,
+                        value: value as Filters[typeof key],
+                    } as any),
                 );
-            }
-
-            return {
-                selectedGeo: null,
-            };
-        });
-
-        const setFilters = (newFilters: Filters) => {
-            setFiltersState(newFilters);
-
-            try {
-                localStorage.setItem(
-                    FILTERS_STORAGE_KEY,
-                    JSON.stringify(newFilters),
-                );
-            } catch (error) {
-                console.warn('Failed to save filters to localStorage:', error);
-            }
-        };
-
-        const updateFilter = (key: keyof Filters, value: any) => {
-            const newFilters = { ...filters, [key]: value };
-
-            setFilters(newFilters);
-        };
-
-        // Синхронізація з localStorage при зміні в іншій вкладці
-        useEffect(() => {
-            const handleStorageChange = (e: StorageEvent) => {
-                if (e.key === FILTERS_STORAGE_KEY && e.newValue) {
-                    try {
-                        const newFilters = JSON.parse(e.newValue);
-
-                        setFiltersState(newFilters);
-                    } catch (error) {
-                        console.warn(
-                            'Failed to parse filters from storage event:',
-                            error,
-                        );
-                    }
-                }
-            };
-
-            window.addEventListener('storage', handleStorageChange);
-
-            return () =>
-                window.removeEventListener('storage', handleStorageChange);
-        }, []);
+            },
+            [dispatch],
+        );
 
         return (
             <WrappedComponent
