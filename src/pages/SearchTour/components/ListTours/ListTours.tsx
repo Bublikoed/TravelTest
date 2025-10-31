@@ -1,13 +1,13 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getHotels } from '../../../../api/api';
-import type { PricesMap } from '../../../../store/filtersSlice';
 import { useAppSelector } from '../../../../store/hooks';
 import { Loader } from '../../../../ui';
 import { EmptyToursCards } from '../../../../ui/EmptyToursCards';
 import HotelCard from '../../../../ui/HotelCard/HotelCard';
 import { getCountryId } from '../../../../utils/getCountryId';
+import { useSearchPrices } from './hook/UsePrices';
 import './ListTours.css';
 
 type Hotel = {
@@ -73,9 +73,10 @@ const generateCards = (
 function ListTours() {
     const { selectedGeo, usdRate } = useAppSelector((s) => s.filters);
     const countryId = getCountryId(selectedGeo);
-    const queryClient = useQueryClient();
-    const prices = queryClient.getQueryData(['prices', countryId]);
     const navigate = useNavigate();
+
+    const { data: prices, isLoading: isLoadingPrices } =
+        useSearchPrices(countryId);
 
     const { data: hotelsMap, isLoading: isLoadingHotels } = useQuery({
         queryKey: ['hotels', countryId],
@@ -99,7 +100,7 @@ function ListTours() {
                 hotel: Hotel | null;
             }>;
 
-        return Object.values(prices as PricesMap).map((offer) => {
+        return Object.values(prices).map((offer) => {
             const hotel = offer.hotelID
                 ? hotelsMap[String(offer.hotelID)] ?? null
                 : null;
@@ -115,23 +116,24 @@ function ListTours() {
         });
     }, [prices, hotelsMap]);
 
+    const isLoading = isLoadingPrices || isLoadingHotels;
+    const hasItems = items.filter((i) => i.hotel).length > 0;
+
     return (
         <div
-            className={`tours-list-container ${
-                items.filter((i) => i.hotel).length === 0 ? 'emptyCards' : ''
-            }`}
+            className={`tours-list-container ${!hasItems ? 'emptyCards' : ''}`}
         >
-            {isLoadingHotels && (
+            {isLoading && (
                 <div className="tours-list-empty">
                     <Loader />
                 </div>
             )}
 
-            {!isLoadingHotels && items.filter((i) => i.hotel).length === 0 && (
+            {!isLoading && !hasItems && (
                 <EmptyToursCards text="Турів не знайдено" />
             )}
 
-            {generateCards(items, navigate, usdRate)}
+            {!isLoading && generateCards(items, navigate, usdRate)}
         </div>
     );
 }

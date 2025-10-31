@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { getSearchPrices, startSearchPrices } from '../../../../../api/api';
+import type { PricesMap } from '../../../../../store/filtersSlice';
 
 interface ErrorResponse {
     code: number;
@@ -8,122 +9,87 @@ interface ErrorResponse {
     waitUntil?: string;
 }
 
-export const useSearchPrices = () => {
-    const [data, setData] = useState<any>(null);
-    const [error, setError] = useState<ErrorResponse | null>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [token, setToken] = useState<string | null>(null);
-    const [waitUntil, setWaitUntil] = useState<string | null>(null);
+const fetchPrices = async (countryID: string): Promise<PricesMap> => {
+    // Крок 1: Запускаємо пошук та отримуємо токен
+    const startResponse = await startSearchPrices(countryID);
 
-    const parseError = async (err: unknown): Promise<ErrorResponse> => {
-        if (err instanceof Response) {
-            try {
-                const json = await err.json();
+    if (!startResponse.ok) {
+        const errorData: ErrorResponse = await startResponse.json();
 
-                return {
-                    code: json?.code ?? err.status ?? 500,
-                    error: true,
-                    message: json?.message ?? 'Unexpected error',
-                    waitUntil: json?.waitUntil,
-                };
-            } catch {
-                return {
-                    code: err.status ?? 500,
-                    error: true,
-                    message: 'Unexpected error',
-                };
-            }
-        }
+        throw errorData;
+    }
 
-        const anyErr: any = err;
+    const startResult = await startResponse.json();
+    const { token, waitUntil } = startResult;
 
-        return {
-            code: anyErr?.code ?? 500,
-            error: true,
-            message: anyErr?.message ?? 'Unexpected error',
-            waitUntil: anyErr?.waitUntil,
-        };
-    };
-
-    const StartSearchPrices = async (countryID: string | null) => {
-        if (!countryID) {
-            setError({
-                code: 400,
-                error: true,
-                message: 'Country ID is required param.',
-            });
-
-            return;
-        }
-
-        setIsLoading(true);
-        setError(null);
-
-        try {
-            const response = await startSearchPrices(countryID);
-
-            if (!response.ok) {
-                const errorData: ErrorResponse = await response.json();
-
-                throw errorData;
-            }
-
-            const result = await response.json();
-
-            setToken(result.token);
-            setWaitUntil(result.waitUntil);
-
-            await GetSearchPrices(result.token, result.waitUntil);
-        } catch (err) {
-            const parsed = await parseError(err);
-
-            setError(parsed);
-            setIsLoading(false);
-        }
-    };
-
-    const GetSearchPrices = async (
+    // Крок 2: Отримуємо результати після очікування
+    const getPricesWithRetry = async (
         searchToken: string,
         nextWaitUntil: string,
         retries = 2,
-    ): Promise<void> => {
+    ): Promise<PricesMap> => {
+        // Очікуємо до waitUntil
         const waitTime = new Date(nextWaitUntil).getTime() - Date.now();
 
         if (waitTime > 0) {
             // eslint-disable-next-line no-promise-executor-return
-            await new Promise((res) => setTimeout(res, waitTime));
+            await new Promise<void>((resolve) => {
+                setTimeout(() => {
+                    resolve();
+                }, waitTime);
+            });
         }
 
-        try {
-            const response = await getSearchPrices(searchToken);
+        const getResponse = await getSearchPrices(searchToken);
 
-            if (!response.ok) {
-                const errorData: ErrorResponse = await response.json();
+        if (!getResponse.ok) {
+            const errorData: ErrorResponse = await getResponse.json();
 
-                if (response.status === 425 && retries > 0) {
-                    return GetSearchPrices(
-                        searchToken,
-                        errorData.waitUntil as string,
-                        retries - 1,
-                    );
-                }
-
-                throw errorData;
+            // Якщо 425 (Too Early) та є retries, повторюємо
+            if (
+                getResponse.status === 425 &&
+                retries > 0 &&
+                errorData.waitUntil
+            ) {
+                return getPricesWithRetry(
+                    searchToken,
+                    errorData.waitUntil,
+                    retries - 1,
+                );
             }
 
-            const result = await response.json();
-
-            setData(result.prices);
-        } catch (err) {
-            const parsed = await parseError(err);
-
-            setError(parsed);
-        } finally {
-            setIsLoading(false);
+            throw errorData;
         }
 
-        return undefined;
+        const result = await getResponse.json();
+
+        return result.prices;
     };
 
-    return { StartSearchPrices, isLoading, data, error, token, waitUntil };
+    return getPricesWithRetry(token, waitUntil);
+};
+
+export const useSearchPrices = (countryID: string | null) => {
+    const query = useQuery<PricesMap, ErrorResponse>({
+        queryKey: ['prices', countryID],
+        queryFn: () => {
+            if (!countryID) {
+                throw new Error('Country ID is required');
+            }
+
+            return fetchPrices(countryID);
+        },
+        enabled: !!countryID,
+        retry: false,
+        staleTime: 5 * 60 * 1000, // 5 хвилин
+        gcTime: 10 * 60 * 1000, // 10 хвилин
+    });
+
+    return {
+        data: query.data,
+        isLoading: query.isLoading,
+        isFetching: query.isFetching,
+        error: query.error,
+        refetch: query.refetch,
+    };
 };
