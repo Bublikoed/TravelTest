@@ -1,9 +1,4 @@
-type GeoItem = {
-    id: string | number;
-    name: string;
-    type: 'country' | 'city' | 'hotel';
-    countryId?: string;
-};
+import type { GeoItem } from '../store/filtersSlice';
 
 export const getCountryId = (
     geo: GeoItem | null | undefined,

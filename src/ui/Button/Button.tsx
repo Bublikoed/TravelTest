@@ -8,6 +8,7 @@ export interface ButtonProps {
     variant?: 'primary' | 'secondary';
     size?: 'small' | 'medium' | 'large';
     className?: string;
+    disabled?: boolean;
 }
 
 function Button({
@@ -15,6 +16,7 @@ function Button({
     onClick,
     variant = 'primary',
     size = 'medium',
+    disabled = false,
     className = '',
 }: ButtonProps) {
     const handleClick = () => {
@@ -27,13 +29,19 @@ function Button({
         'button',
         `button--${variant}`,
         `button--${size}`,
+        disabled ? 'button--disabled' : '',
         className,
     ]
         .filter(Boolean)
         .join(' ');
 
     return (
-        <button type="button" onClick={handleClick} className={buttonClasses}>
+        <button
+            type="button"
+            onClick={handleClick}
+            className={buttonClasses}
+            disabled={disabled}
+        >
             {children}
         </button>
     );

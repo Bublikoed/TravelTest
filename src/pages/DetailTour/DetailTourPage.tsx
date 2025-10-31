@@ -8,15 +8,8 @@ import DetailTourImage from '../../components/DetailTourImage';
 import DetailTourInfo from '../../components/DetailTourInfo';
 import DetailTourLoading from '../../components/DetailTourLoading';
 import DetailTourServices from '../../components/DetailTourServices';
+import type { PriceOffer } from '../../store/filtersSlice';
 import './DetailTourPage.css';
-
-type PriceOffer = {
-    id: string;
-    amount: number;
-    currency: string;
-    startDate: string;
-    endDate: string;
-};
 
 type HotelDetail = {
     id: number;
@@ -42,9 +35,6 @@ function DetailTourPage() {
         hotelId: string;
     }>();
     const navigate = useNavigate();
-
-    console.log('priceId', priceId);
-    console.log('hotelId', hotelId);
 
     // Конвертуємо hotelId в число, оскільки в базі даних id - це число
     const hotelIdNumber = hotelId ? Number.parseInt(hotelId, 10) : null;

@@ -41,7 +41,8 @@ const filtersSlice = createSlice({
         ) => {
             const { key, value } = action.payload;
 
-            state[key] = value as any;
+            // Type-safe assignment
+            state[key] = value;
         },
     },
 });

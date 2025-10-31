@@ -1,13 +1,7 @@
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useMemo, useRef } from 'react';
+import type { GeoItem } from '../../store/filtersSlice';
 import './GeoDropdown.css';
-
-type GeoItem = {
-    id: string | number;
-    name: string;
-    type: 'country' | 'city' | 'hotel';
-    flag?: string;
-};
 
 export type GeoDropdownProps = {
     isOpen: boolean;
@@ -90,7 +84,15 @@ function GeoDropdown({
                                         role="button"
                                         tabIndex={0}
                                         onClick={() => onSelect(item)}
-                                        onKeyDown={() => {}}
+                                        onKeyDown={(e) => {
+                                            if (
+                                                e.key === 'Enter' ||
+                                                e.key === ' '
+                                            ) {
+                                                e.preventDefault();
+                                                onSelect(item);
+                                            }
+                                        }}
                                         style={{
                                             position: 'absolute',
                                             top: 0,

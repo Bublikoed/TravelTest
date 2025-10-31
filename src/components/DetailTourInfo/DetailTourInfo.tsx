@@ -1,14 +1,7 @@
 import { useAppSelector } from '../../store/hooks';
+import type { PriceOffer } from '../../store/filtersSlice';
 import { formatDate, formatPrice } from '../../utils/formatters';
 import './DetailTourInfo.css';
-
-type PriceOffer = {
-    id: string;
-    amount: number;
-    currency: string;
-    startDate: string;
-    endDate: string;
-};
 
 type DetailTourInfoProps = {
     priceData: PriceOffer;

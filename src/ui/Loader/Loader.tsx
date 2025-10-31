@@ -18,7 +18,9 @@ function Loader({
         .filter(Boolean)
         .join(' ');
 
-    const style = color ? { ['--loader-color' as any]: color } : undefined;
+    const style: React.CSSProperties | undefined = color
+        ? ({ '--loader-color': color } as React.CSSProperties)
+        : undefined;
 
     return (
         <div

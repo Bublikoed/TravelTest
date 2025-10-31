@@ -1,17 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useRef, useState } from 'react';
 import { getCountries, searchGeo } from '../../api/api';
+import type { GeoItem } from '../../store/filtersSlice';
 import { Button, Input } from '../../ui';
 import GeoDropdown from '../GeoDropdown';
 import './SearchGeo.css';
-
-type GeoItem = {
-    id: string | number;
-    name: string;
-    type: 'country' | 'city' | 'hotel';
-    countryId?: string;
-    flag?: string;
-};
 
 type CountryItem = {
     id: string | number;
@@ -20,11 +13,11 @@ type CountryItem = {
     flag?: string;
 };
 
-function SerchGeo({
-    onChange,
+function SearchGeo({
+    onSearch,
     defaultValue,
 }: {
-    onChange: (value: GeoItem | null) => void;
+    onSearch: (value: GeoItem | null) => void;
     defaultValue?: GeoItem | null;
 }) {
     const [inputValue, setInputValue] = useState(defaultValue?.name || '');
@@ -37,6 +30,7 @@ function SerchGeo({
         'all' | 'country' | 'city' | 'hotel'
     >('all');
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
 
     const {
         data: geoData,
@@ -113,6 +107,10 @@ function SerchGeo({
         setInputValue(item.name);
         setFilterType(item.type);
         setIsDropdownOpen(false);
+        // Повертаємо фокус на input, щоб Enter працював
+        setTimeout(() => {
+            inputRef.current?.focus();
+        }, 0);
     };
     const handleInputFocus = async () => {
         if (selectedItem?.type === 'country') {
@@ -140,20 +138,40 @@ function SerchGeo({
         setFilterType('all');
         setIsDropdownOpen(false);
         setCountriesData([]);
+        // Повертаємо фокус на input, щоб Enter працював
+        setTimeout(() => {
+            inputRef.current?.focus();
+        }, 0);
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            setIsDropdownOpen(false);
+            onSearch(selectedItem);
+        }
+    };
+
+    const handleFormSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsDropdownOpen(false);
+        onSearch(selectedItem);
     };
 
     return (
-        <div className="search-geo-container">
+        <form onSubmit={handleFormSubmit} className="search-geo-container">
             <div className="search-inputs">
                 <div className="search-field" ref={dropdownRef}>
                     <div className="input-with-clear">
                         <Input
+                            ref={inputRef}
                             placeholder="Введіть назву міста, країни або готель"
                             size="large"
                             variant="outlined"
                             value={inputValue}
                             onChange={handleInputChange}
                             onFocus={handleInputFocus}
+                            onKeyDown={handleKeyDown}
                         />
                         {inputValue && (
                             <button
@@ -184,12 +202,12 @@ function SerchGeo({
             <Button
                 variant="primary"
                 size="large"
-                onClick={() => onChange(selectedItem)}
+                onClick={() => onSearch(selectedItem)}
             >
                 🔍 Пошук турів
             </Button>
-        </div>
+        </form>
     );
 }
 
-export default SerchGeo;
+export default SearchGeo;

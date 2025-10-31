@@ -12,7 +12,7 @@ import { useAppDispatch, useAppSelector } from '../store/hooks';
 interface WithFiltersProps {
     filters: Filters;
     setFilters: (filters: Filters) => void;
-    updateFilter: (key: keyof Filters, value: any) => void;
+    updateFilter: <K extends keyof Filters>(key: K, value: Filters[K]) => void;
 }
 
 function withFilters<P extends object>(
@@ -30,14 +30,15 @@ function withFilters<P extends object>(
         );
 
         const updateFilter = useMemo(
-            () => (key: keyof Filters, value: any) => {
-                dispatch(
-                    updateFilterAction({
-                        key: key as keyof Filters,
-                        value: value as Filters[typeof key],
-                    } as any),
-                );
-            },
+            () =>
+                <K extends keyof Filters>(key: K, value: Filters[K]) => {
+                    dispatch(
+                        updateFilterAction({
+                            key,
+                            value,
+                        }),
+                    );
+                },
             [dispatch],
         );
 

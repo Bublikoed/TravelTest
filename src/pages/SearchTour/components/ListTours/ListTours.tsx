@@ -6,6 +6,7 @@ import { useAppSelector } from '../../../../store/hooks';
 import { Loader } from '../../../../ui';
 import { EmptyToursCards } from '../../../../ui/EmptyToursCards';
 import HotelCard from '../../../../ui/HotelCard/HotelCard';
+import { formatDate } from '../../../../utils/formatters';
 import { getCountryId } from '../../../../utils/getCountryId';
 import { useSearchPrices } from './hook/UsePrices';
 import './ListTours.css';
@@ -21,12 +22,6 @@ type Hotel = {
 };
 
 type HotelsMap = Record<string, Hotel>;
-
-const formatDate = (iso: string) => {
-    const [y, m, d] = iso.split('-');
-
-    return `${d}.${m}.${y}`;
-};
 
 const generateCards = (
     items: Array<{

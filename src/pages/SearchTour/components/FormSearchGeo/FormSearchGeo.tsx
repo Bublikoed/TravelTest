@@ -1,17 +1,14 @@
 import SearchGeo from '../../../../components/SearchGeo';
+import type { GeoItem } from '../../../../store/filtersSlice';
 import './FormSearchGeo.css';
 
-type GeoItem = {
-    id: string | number;
-    name: string;
-    type: 'country' | 'city' | 'hotel';
-    countryId?: string;
-    flag?: string;
+type FormSearchFields = {
+    selectedGeo: GeoItem | null;
 };
 
 type FormSearchProps = {
-    setFields: (fields: any) => void;
-    fields: any;
+    setFields: (fields: FormSearchFields) => void;
+    fields: FormSearchFields;
 };
 
 function FormSearchGeo({ fields, setFields }: FormSearchProps) {
@@ -23,7 +20,7 @@ function FormSearchGeo({ fields, setFields }: FormSearchProps) {
         <div>
             <div className="search-form">
                 <SearchGeo
-                    onChange={setValue}
+                    onSearch={setValue}
                     defaultValue={fields.selectedGeo}
                 />
             </div>
