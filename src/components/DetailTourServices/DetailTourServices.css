@@ -1,0 +1,46 @@
+.detail-tour-services {
+    padding: 30px;
+}
+
+.detail-tour-services h2 {
+    color: #4f46e5;
+    margin: 0 0 20px 0;
+    font-size: 1.5em;
+}
+
+.detail-tour-services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.detail-tour-service-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 3px solid #4f46e5;
+}
+
+.detail-tour-service-label {
+    color: #666;
+    font-weight: 500;
+}
+
+.detail-tour-service-value {
+    color: #333;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .detail-tour-services {
+        padding: 20px;
+    }
+
+    .detail-tour-services-grid {
+        grid-template-columns: 1fr;
+    }
+}
+

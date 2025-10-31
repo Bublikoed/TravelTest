@@ -1,0 +1,29 @@
+.detail-tour-header {
+    padding: 30px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.detail-tour-header h1 {
+    color: white;
+    margin: 0 0 10px 0;
+    font-size: 2em;
+    text-align: left;
+}
+
+.detail-tour-location {
+    margin: 0;
+    font-size: 1.1em;
+    opacity: 0.95;
+}
+
+@media (max-width: 768px) {
+    .detail-tour-header {
+        padding: 20px;
+    }
+
+    .detail-tour-header h1 {
+        font-size: 1.5em;
+    }
+}
+

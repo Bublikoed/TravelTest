@@ -1,13 +1,17 @@
 .tours-list-container {
     width: 100%;
     max-width: 700px;
-    padding: 25px;
     margin: 0 auto;
     display: grid;
     grid-template-columns: repeat(2, minmax(250px, 1fr));
     gap: 16px;
     align-content: start;
-    min-height: calc(100vh - 300px);
+    height: 100%;
+    overflow-y: auto;
+}
+
+.tours-list-container.emptyCards {
+    grid-template-columns: 1fr;
 }
 
 .tours-list-item {
@@ -31,6 +35,13 @@
 .tours-list-container > div:only-child {
     margin: auto;
     text-align: center;
+}
+
+.tours-list-empty {
+    text-align: center;
+    font-size: 16px;
+    font-weight: 500;
+    color: #666;
 }
 
 /* If the available width is too small to keep two 250px columns (plus gap),

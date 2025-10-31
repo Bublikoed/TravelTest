@@ -1,0 +1,24 @@
+.detail-tour-description {
+    padding: 30px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.detail-tour-description h2 {
+    color: #4f46e5;
+    margin: 0 0 15px 0;
+    font-size: 1.5em;
+}
+
+.detail-tour-description p {
+    color: #666;
+    font-size: 1.1em;
+    line-height: 1.6;
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .detail-tour-description {
+        padding: 20px;
+    }
+}
+

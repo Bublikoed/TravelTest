@@ -1,0 +1,37 @@
+.detail-tour {
+    padding: 20px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.detail-tour-back-button {
+    background: #4f46e5;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: background-color 0.2s;
+}
+
+.detail-tour-back-button:hover {
+    background: #4338ca;
+}
+
+.detail-tour-back-button:active {
+    background: #3730a3;
+}
+
+.detail-tour-error {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+}
+
+.detail-tour-error h2 {
+    color: #dc2626;
+    margin-bottom: 15px;
+}
+

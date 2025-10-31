@@ -1,8 +1,11 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getHotels } from '../../../../api/api';
 import type { PricesMap } from '../../../../store/filtersSlice';
 import { useAppSelector } from '../../../../store/hooks';
+import { Loader } from '../../../../ui';
+import { EmptyToursCards } from '../../../../ui/EmptyToursCards';
 import HotelCard from '../../../../ui/HotelCard/HotelCard';
 import { getCountryId } from '../../../../utils/getCountryId';
 import './ListTours.css';
@@ -25,14 +28,55 @@ const formatDate = (iso: string) => {
     return `${d}.${m}.${y}`;
 };
 
+const generateCards = (
+    items: Array<{
+        id: string;
+        price: number;
+        currency: string;
+        startDate: string;
+        endDate: string;
+        hotel: Hotel | null;
+    }>,
+    navigate: ReturnType<typeof useNavigate>,
+    usdRate: number,
+) =>
+    items
+        .filter((i) => i.hotel)
+        .map((item) => {
+            const h = item.hotel as Hotel;
+            const desc = `Початок: ${formatDate(item.startDate)} — ${formatDate(
+                item.endDate,
+            )}`;
+            const location = `${h.countryName}, ${h.cityName}`;
+
+            const priceInUah =
+                item.currency === 'usd' ? item.price * usdRate : item.price;
+
+            return (
+                <div key={item.id} className="tours-list-item">
+                    <HotelCard
+                        id={item.id}
+                        name={h.name}
+                        description={desc}
+                        imageUrl={h.img}
+                        price={priceInUah}
+                        currency="грн"
+                        location={location}
+                        onViewDetails={() => {
+                            navigate(`/detail-tour/${item.id}/${h.id}`);
+                        }}
+                    />
+                </div>
+            );
+        });
+
 function ListTours() {
-    const { selectedGeo } = useAppSelector((s) => s.filters);
+    const { selectedGeo, usdRate } = useAppSelector((s) => s.filters);
     const countryId = getCountryId(selectedGeo);
     const queryClient = useQueryClient();
     const prices = queryClient.getQueryData(['prices', countryId]);
+    const navigate = useNavigate();
 
-    console.log('prices', prices);
-    console.log('countryId', countryId);
     const { data: hotelsMap, isLoading: isLoadingHotels } = useQuery({
         queryKey: ['hotels', countryId],
         enabled: !!countryId,
@@ -71,54 +115,23 @@ function ListTours() {
         });
     }, [prices, hotelsMap]);
 
-    if (!prices) {
-        return (
-            <div className="tours-list-container">
-                <div>турів не знайдено</div>
-            </div>
-        );
-    }
-
     return (
-        <div className="tours-list-container">
-            {isLoadingHotels && <div>Завантаження готелів…</div>}
-
-            {!isLoadingHotels && items.filter((i) => i.hotel).length === 0 && (
-                <div>турів не знайдено</div>
+        <div
+            className={`tours-list-container ${
+                items.filter((i) => i.hotel).length === 0 ? 'emptyCards' : ''
+            }`}
+        >
+            {isLoadingHotels && (
+                <div className="tours-list-empty">
+                    <Loader />
+                </div>
             )}
 
-            {items
-                .filter((i) => i.hotel)
-                .map((item) => {
-                    const h = item.hotel as Hotel;
-                    const desc = `Початок: ${formatDate(
-                        item.startDate,
-                    )} — ${formatDate(item.endDate)}`;
-                    const location = `${h.countryName}, ${h.cityName}`;
+            {!isLoadingHotels && items.filter((i) => i.hotel).length === 0 && (
+                <EmptyToursCards text="Турів не знайдено" />
+            )}
 
-                    return (
-                        <div key={item.id} className="tours-list-item">
-                            <HotelCard
-                                id={item.id}
-                                name={h.name}
-                                description={desc}
-                                imageUrl={h.img}
-                                price={item.price}
-                                currency={item.currency}
-                                location={location}
-                                showBookButton={false}
-                            />
-                            <a
-                                className="tours-list-price-link"
-                                href={`/price/${item.id}`}
-                                target="_blank"
-                                rel="noreferrer"
-                            >
-                                Відкрити ціну
-                            </a>
-                        </div>
-                    );
-                })}
+            {generateCards(items, navigate, usdRate)}
         </div>
     );
 }

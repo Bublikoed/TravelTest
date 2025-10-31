@@ -21,10 +21,12 @@ export type PricesMap = Record<string, PriceOffer>;
 
 export type FiltersState = {
     selectedGeo: GeoItem | null;
+    usdRate: number;
 };
 
 const initialState: FiltersState = {
     selectedGeo: null,
+    usdRate: 40,
 };
 
 const filtersSlice = createSlice({

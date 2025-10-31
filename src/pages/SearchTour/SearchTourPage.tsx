@@ -37,7 +37,7 @@ function SearchTourPage({ filters, updateFilter }: WithFiltersProps) {
         const cached = queryClient.getQueryData(['prices', targetId]);
 
         if (!cached) {
-            await StartSearchPrices(targetId); // тільки якщо нема в кеші
+            await StartSearchPrices(targetId);
         }
     };
 
@@ -60,8 +60,15 @@ function SearchTourPage({ filters, updateFilter }: WithFiltersProps) {
         if (countryId) handleSearch();
     }, [countryId]);
 
+    useEffect(() => {
+        if (!filters.usdRate) {
+            updateFilter('usdRate', 40);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     return (
-        <div className="search-tour">
+        <div className="page-container search-tour">
             <h1>Пошук турів</h1>
             <FormSearchGeo setFields={handleSetFields} fields={defaultForm} />
 

@@ -11,7 +11,10 @@ function App() {
             <Main>
                 <Routes>
                     <Route path="/" element={<SearchTourPage />} />
-                    <Route path="/detail-tour" element={<DetailTourPage />} />
+                    <Route
+                        path="/detail-tour/:priceId/:hotelId"
+                        element={<DetailTourPage />}
+                    />
                 </Routes>
             </Main>
             <ReactQueryDevtools initialIsOpen={false} />

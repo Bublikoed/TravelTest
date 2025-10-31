@@ -1,0 +1,12 @@
+.detail-tour {
+    padding: 20px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.detail-tour-loading {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+}
+

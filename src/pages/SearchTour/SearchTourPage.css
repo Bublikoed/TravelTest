@@ -1,7 +1,9 @@
 .search-tour {
     padding: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
+}
+
+.search-tour.empty .tours-list-container {
+    grid-template-columns: repeat(1, minmax(250px, 1fr));
 }
 
 .search-tour h1 {

@@ -25,7 +25,7 @@ export const store = configureStore({
         filters: filtersReducer,
     },
     preloadedState: {
-        filters: loadFiltersFromStorage() ?? { selectedGeo: null },
+        filters: loadFiltersFromStorage() ?? { selectedGeo: null, usdRate: 40 },
     },
 });
 

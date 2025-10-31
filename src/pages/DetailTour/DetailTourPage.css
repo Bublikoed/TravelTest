@@ -1,49 +1,199 @@
 .detail-tour {
     padding: 20px;
-    max-width: 600px;
+    max-width: 900px;
     margin: 0 auto;
 }
 
-.detail-tour h1 {
-    color: #333;
-    margin-bottom: 30px;
+.detail-tour-back-button {
+    background: #4f46e5;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: background-color 0.2s;
+}
+
+.detail-tour-back-button:hover {
+    background: #4338ca;
+}
+
+.detail-tour-back-button:active {
+    background: #3730a3;
+}
+
+.detail-tour-loading,
+.detail-tour-error {
     text-align: center;
+    padding: 40px;
+    color: #666;
 }
 
-.tour-details {
-    background: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 12px;
-    padding: 30px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.tour-details h2 {
-    color: #4f46e5;
+.detail-tour-error h2 {
+    color: #dc2626;
     margin-bottom: 15px;
-    font-size: 1.8em;
 }
 
-.description {
+.detail-tour-content {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.detail-tour-header {
+    padding: 30px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.detail-tour-header h1 {
+    color: white;
+    margin: 0 0 10px 0;
+    font-size: 2em;
+    text-align: left;
+}
+
+.detail-tour-location {
+    margin: 0;
+    font-size: 1.1em;
+    opacity: 0.95;
+}
+
+.detail-tour-image {
+    width: 100%;
+    max-height: 500px;
+    overflow: hidden;
+}
+
+.detail-tour-image img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    display: block;
+}
+
+.detail-tour-description {
+    padding: 30px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.detail-tour-description h2 {
+    color: #4f46e5;
+    margin: 0 0 15px 0;
+    font-size: 1.5em;
+}
+
+.detail-tour-description p {
     color: #666;
     font-size: 1.1em;
     line-height: 1.6;
-    margin-bottom: 25px;
+    margin: 0;
 }
 
-.tour-info {
+.detail-tour-info {
+    padding: 30px;
     background: #f8f9fa;
-    padding: 20px;
-    border-radius: 8px;
-    border-left: 4px solid #4f46e5;
+    border-bottom: 1px solid #e0e0e0;
 }
 
-.tour-info p {
-    margin: 10px 0;
-    font-size: 1.1em;
-    color: #333;
-}
-
-.tour-info strong {
+.detail-tour-info h2 {
     color: #4f46e5;
+    margin: 0 0 20px 0;
+    font-size: 1.5em;
+}
+
+.detail-tour-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.detail-tour-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.detail-tour-info-item strong {
+    color: #4f46e5;
+    font-size: 0.9em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.detail-tour-info-item span {
+    color: #333;
+    font-size: 1.1em;
+    font-weight: 500;
+}
+
+.detail-tour-price {
+    color: #059669;
+    font-size: 1.3em;
+    font-weight: 700;
+}
+
+.detail-tour-services {
+    padding: 30px;
+}
+
+.detail-tour-services h2 {
+    color: #4f46e5;
+    margin: 0 0 20px 0;
+    font-size: 1.5em;
+}
+
+.detail-tour-services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.detail-tour-service-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 3px solid #4f46e5;
+}
+
+.detail-tour-service-label {
+    color: #666;
+    font-weight: 500;
+}
+
+.detail-tour-service-value {
+    color: #333;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .detail-tour {
+        padding: 15px;
+        max-width: 100%;
+    }
+
+    .detail-tour-header {
+        padding: 20px;
+    }
+
+    .detail-tour-header h1 {
+        font-size: 1.5em;
+    }
+
+    .detail-tour-description,
+    .detail-tour-info,
+    .detail-tour-services {
+        padding: 20px;
+    }
+
+    .detail-tour-info-grid,
+    .detail-tour-services-grid {
+        grid-template-columns: 1fr;
+    }
 }

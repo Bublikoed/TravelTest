@@ -1,0 +1,53 @@
+.detail-tour-info {
+    padding: 30px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.detail-tour-info h2 {
+    color: #4f46e5;
+    margin: 0 0 20px 0;
+    font-size: 1.5em;
+}
+
+.detail-tour-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.detail-tour-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.detail-tour-info-item strong {
+    color: #4f46e5;
+    font-size: 0.9em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.detail-tour-info-item span {
+    color: #333;
+    font-size: 1.1em;
+    font-weight: 500;
+}
+
+.detail-tour-price {
+    color: #059669;
+    font-size: 1.3em;
+    font-weight: 700;
+}
+
+@media (max-width: 768px) {
+    .detail-tour-info {
+        padding: 20px;
+    }
+
+    .detail-tour-info-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
